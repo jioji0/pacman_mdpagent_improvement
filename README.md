@@ -1,5 +1,13 @@
 # An MDP solver for Pacman
 
-The files that I wrote in exclusively is mdpAgents.py; the rest of the materials are from Berkeley's Cs188x AI course (so I claim no credit for them).
+UC Berkeley: Pacman
+UC 버클리의 인공지능 예제인 팩맨 프로젝트를 기반으로
+Pacman의 환경을 이해하고
+K-Scrum 개발 프로세스를 적용하여
+다양항 강화학습 알고리즘으로 Pacman을 학습시켜
+가장 좋은 성능을 내는 프로젝트입니다.
 
-To run, download the files and move to the directory where the base files are in, and run `python pacman.py -p mdpAgent -l mediumClassic`
+Pacman Game
+• Pacman을 조종하여 Ghost들을 피해서 화면에 있는 Food들을 다 먹는 것
+• Capsule(커다란 점)를 먹으면 일정 시간 동안 파워업하여 주눅든 Ghost를 역으로 잡아먹을 수 있음
+![image](https://user-images.githubusercontent.com/95209060/235901640-8b4e5d10-e93e-4d2b-87ec-37dbe3dac4de.png)
