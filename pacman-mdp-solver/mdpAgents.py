@@ -372,7 +372,7 @@ class MDPAgent(Agent):
 		
 		foodToCalculate = []
 		for i in range(3): #230520 jjm/ Changed 5 -> 3
-			for j in range(len(ghosts)):			#230520 jjm/ Added for check ghostState
+			for j in range(len(ghosts)):			#230520 jjm/ Add for check ghostState
 				ghostTime = ghostStates[j][1]		#
 				if (ghostTime <= 1) :				#
 					for x in range(len(ghosts)):
