@@ -230,10 +230,11 @@ class MDPAgent(Agent):
 			for j in range(len(ghosts)):
 				ghostTime = ghostStates[j][1]
 				#Convert coordinates to int (keys are stored as int, but coordinates from API are stored as float)
-				if ((int(ghosts[j][0])), (int(ghosts[j][1]))) == i:
-					valueMap[i] = -10
-				#elif ((int(ghosts[j][0])), (int(ghosts[j][1]))) == i and ghostTime >= 5:
-				#	valueMap[i] = 5
+				if ((int(ghosts[j][0])), (int(ghosts[j][1]))) == i and ghostTime >= 1: #230519 jjm/ Added ghostTime
+					valueMap[i] = 500	#230520 jjm/ Changed 5 -> 500
+				elif ((int(ghosts[j][0])), (int(ghosts[j][1]))) == i:
+					valueMap[i] = -1000	#230520 jjm/ Changed -10 -> -1000
+				
 
 		return valueMap
 
@@ -354,6 +355,7 @@ class MDPAgent(Agent):
 		food = api.food(state)
 		ghosts = api.ghosts(state)
 		capsules = api.capsules(state)
+		ghostStates = api.ghostStatesWithTimes(state) # 230520 added
 
 		#Get max width and height
 		maxWidth = self.getLayoutWidth(corners) - 1
@@ -365,21 +367,27 @@ class MDPAgent(Agent):
 		# if a ghost is near by
 		# This does not work in small maps due to the virtue of those maps being far too small
 		# making this function redundant for them
+
+
+		
 		foodToCalculate = []
-		for i in range(5):
-			for x in range(len(ghosts)):
-				# Append coordinates 5 squares east to ghost
-				if (int(ghosts[x][0] + i), int(ghosts[x][1])) not in foodToCalculate:
-					foodToCalculate.append((int(ghosts[x][0] + i), int(ghosts[x][1])))
-				# Append coordinates 5 squares west to ghost
-				if (int(ghosts[x][0] - i), int(ghosts[x][1])) not in foodToCalculate:
-					foodToCalculate.append((int(ghosts[x][0] - i), int(ghosts[x][1])))
-				# Append coordinates 5 squares north to ghost
-				if (int(ghosts[x][0]), int(ghosts[x][1] + 1)) not in foodToCalculate:
-					foodToCalculate.append((int(ghosts[x][0]), int(ghosts[x][1] + i)))
-				# Append coordinates 5 squares south to ghost
-				if (int(ghosts[x][0]), int(ghosts[x][1] - 1)) not in foodToCalculate:
-					foodToCalculate.append((int(ghosts[x][0]), int(ghosts[x][1] - i)))
+		for i in range(3): #230520 jjm/ Changed 5 -> 3
+			for j in range(len(ghosts)):			#230520 jjm/ Add for check ghostState
+				ghostTime = ghostStates[j][1]		#
+				if (ghostTime <= 1) :				#
+					for x in range(len(ghosts)):
+						# Append coordinates 3 squares east to ghost
+						if (int(ghosts[x][0] + i), int(ghosts[x][1])) not in foodToCalculate:
+							foodToCalculate.append((int(ghosts[x][0] + i), int(ghosts[x][1])))
+						# Append coordinates 3 squares west to ghost
+						if (int(ghosts[x][0] - i), int(ghosts[x][1])) not in foodToCalculate:
+							foodToCalculate.append((int(ghosts[x][0] - i), int(ghosts[x][1])))
+						# Append coordinates 3 squares north to ghost
+						if (int(ghosts[x][0]), int(ghosts[x][1] + 1)) not in foodToCalculate:
+							foodToCalculate.append((int(ghosts[x][0]), int(ghosts[x][1] + i)))
+						# Append coordinates 3 squares south to ghost
+						if (int(ghosts[x][0]), int(ghosts[x][1] - 1)) not in foodToCalculate:
+							foodToCalculate.append((int(ghosts[x][0]), int(ghosts[x][1] - i)))
 
 
 		# A list of coordinates that should not be calculated
@@ -397,7 +405,7 @@ class MDPAgent(Agent):
 			raise ValueError("MDP must have a gamma between 0 and 1.")
 
 		# Implement Bellman equation with _-loop iteration
-		loops = 200
+		loops = 200	#230520 jjm/ Changed 100 -> ?
 		while loops > 0:
 			V = V1.copy() # This will store the old values
 			for i in range(maxWidth):
@@ -406,6 +414,10 @@ class MDPAgent(Agent):
 					# Except for food that are within 5 squares north/south/east/west of the ghost
 					if (i, j) not in walls and (i, j) not in doNotCalculate and (i, j) not in ghosts and (i, j) not in capsules:
 						V1[(i, j)] = reward + gamma * self.getTransition(i, j, V)
+					
+					#230520 jjm, Add panalty for not moving
+					if (i, j) == api.whereAmI(state):
+						V1[(i, j)] -= 5
 			loops -= 1
 
 	def valueIterationSmall(self, state, reward, gamma, V1):
