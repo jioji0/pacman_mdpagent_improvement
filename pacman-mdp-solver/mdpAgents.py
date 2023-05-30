@@ -34,6 +34,8 @@ import api
 import random
 import game
 import util
+import numpy as np
+from aStar import astar
 
 class Grid:
 
@@ -564,10 +566,44 @@ class MDPAgent(Agent):
 		print "-" * 30
 		legal = api.legalActions(state)
 		corners = api.corners(state)
+		pacman = api.whereAmI(state)		#230530 jjm/ for a* algorithm
+		ghosts = api.ghosts(state)			#
+		capsules = api.capsules(state)		#
+		food = api.food(state)				#
+		walls = api.walls(state)			#
 
 		maxWidth = self.getLayoutWidth(corners) - 1
 		maxHeight = self.getLayoutHeight(corners) - 1
 
+		#230530 jjm/ get map array
+		array = np.zeros((maxHeight+1, maxWidth+1))
+		for wall in walls:
+			array[wall[1]][wall[0]] = 1
+
+		#230530 jjm/ if capsules, use A* algorithm to capsules
+		if capsules:
+			path_to_capsule = []
+			for capsule in capsules:
+				path = astar(array, pacman, capsule)
+				
+				print(path)
+				if path:
+					path_to_capsule.append((len(path), path))
+			if path_to_capsule:
+				path_to_capsule.sort()
+
+				if len(path_to_capsule[0][1]) > 1:
+					next_step = path_to_capsule[0][1][-2]
+
+					dx, dy = next_step[0] - pacman[0], next_step[1] - pacman[1]
+					if dx > 0: next_step_direction = 'East'
+					elif dx < 0: next_step_direction = 'West'
+					elif dy > 0: next_step_direction = 'North'
+					elif dy < 0: next_step_direction = 'South'
+					else: next_step_direction = 'Stop'
+
+					return api.makeMove(next_step_direction, legal)
+	
 		# This function updates all locations at every state
 		# for every action retrieved by getAction, thi3s map is recalibrated
 		valueMap = self.makeValueMap(state)
