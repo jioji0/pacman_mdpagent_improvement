@@ -10,4 +10,5 @@ K-Scrum 개발 프로세스를 적용하여<br>
 Pacman Game<br>
 • Pacman을 조종하여 Ghost들을 피해서 화면에 있는 Food들을 다 먹는 것<br>
 • Capsule(커다란 점)를 먹으면 일정 시간 동안 파워업하여 주눅든 Ghost를 역으로 잡아먹을 수 있음<br>
+
 ![Image](https://github.com/user-attachments/assets/0fa2255e-0e3a-41f7-a93d-18f43813f18d)
